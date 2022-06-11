@@ -34,3 +34,21 @@ Untuk menambahkan key, gunakan public key dan isikan pada baris baru pada `~/.ss
 
 Pada perusahaan skala besar, butuh cara tertentu untuk manajemen ssh key. https://www.ssh.com/academy/iam/ssh-key-management
 
+Saran keamanan:
+- Buat password untuk menggunakan private key.
+- Masukkan perintah `chmod 400 private_key` agar hanya dapat dibaca oleh pemilik key.
+
+## Import Public Key ke Server Lain
+**Kondisi 1**, ketika kamu mengetahui username dan password dari server.
+```sh
+ssh-copy-id -i ~/.ssh/id_rsa.pub YOUR_USER_NAME@IP_ADDRESS_OF_THE_SERVER
+```
+
+**Kondisi 2**, memasukkan  secara manual
+```sh
+vim ~/.ssh/authorized_keys
+
+# masukkan entry dari public key, contohnya
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ3GIJzTX7J6zsCrywcjAM/7Kq3O9ZIvDw2OFOSXAFVqilSFNkHlefm1iMtPeqsIBp2t9cbGUf55xNDULz/bD/4BCV43yZ5lh0cUYuXALg9NI29ui7PEGReXjSpNwUD6ceN/78YOK41KAcecq+SS0bJ4b4amKZIJG3JWm49NWvoo0hdM71sblF956IXY3cRLcTjPlQ84mChKL1X7+D645c7O4Z1N3KtL7l5nVKSG81ejkeZsGFzJFNqvr5DuHdDL5FAudW23me3BDmrM9ifUmt1a00mWci/1qUlaVFft085yvVq7KZbF2OP2NQACUkwfwh+iSTP username@hostname
+```
+
