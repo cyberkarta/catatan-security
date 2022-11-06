@@ -91,4 +91,73 @@ Beats are data shippers that you can install directly on an endpoint to send dat
 ### Filebeat
 Ship files into Logstash or directly into Elasticsearch. It uses modules that are preconfigured to ship specific types of logs in a standardized schema that either aligns with Elastic Common Schema (ECS) or uses the same design concepts if the specific ECS fieldset doesn't exist. List of Filebeat modules: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html.
 
-page 56 (installing FIlebeat to get data into Elasticsearch)
+Filebeat instance -> send data into Elasticsearch
+- Download file beat: https://www.elastic.co/downloads/beats/filebeat
+- `vim filebeat.yml`
+	- Uncomment proper line for your OS
+	- Change the log input type to `enabled: true`
+
+```sh
+filebeat.inputs:
+# Each - is an input. Most options can be set at the
+input level, so
+# you can use different inputs for various
+configurations.
+# Below are the input specific configurations.
+- type: log
+
+# Change to true to enable this input configuration.
+enabled: true
+# Paths that should be crawled and fetched. Glob based
+paths.
+paths:
+- /var/log/*.log
+#- c:\programdata\elasticsearch\logs\*
+```
+- On that file we will be sending files that end in `*.log` inside `/var/log` directory to Elasticsearch.
+- Make sure Elasticsearch is up and ready to accept data. `curl loclahost:9200?pretty`
+- Test Filebeat and ensure that it's able to send data and properly configured. `filebeat test output`
+- Fire up Filebeat and ingest those logs: `./filebeat`
+- If we go back and check Elasticsearch like the way we did for Logstash data, we'll see that there is a new index called filebeat-{version}-{date}-{index iteration}
+
+### Packetbeat
+Focused on collecting network metadata. The goal of Packetbeat is more focused around application type network traffic. In contrast with something such as Zeek or Suricata do. The meta data collected:
+- Source and destination IP
+- Network Protocols
+- You won't see any specific payloads as you may see in full packet capture
+
+Packet beat can provides metadata of:
+- ICMP
+- DHCP
+- DNS
+- HTTP
+- AMQP
+- Cassandra
+- MySQL
+- PostgreSQL
+- Redis
+- Thrift RPC
+- MongoDB
+- Memcache
+- NFS
+- TLS
+- SIP/SDP
+
+DNS, HTTP, and TLS provides solid value for threat hunting.
+
+Installing Packetbeat
+- Download packet beat https://www.elastic.co/downloads/beats/packetbeat
+- In Windows, you have to download Npcap https://nmap.org/npcap/dist/npcap-1.10.exe
+- Identify what device to capture on. You can use Packetbeat binary to identify this `./packetbeat devices`
+- `vim packetbeat.yml` select the network interfaceto sniff the data, on linux we can use "any" to sniff on all connected interfaces.
+	- `packetbeat.interface.device: en0`
+- Test configuration `./packetbeat test output` dan `./packetbeat test output`
+
+Ingesting previously collected PCAP
+- Simulate with tcpdump.
+  `tcpdump -i en0 -s 65535 -w local-capture.pcap`
+- Replay packet capture into Elasticsearch and will automatically quit once it reaches the end of the PCAP.
+  `./packetbeat run -I local-capture.pcap`
+It can be used for incident response training. Deploying a proper Network Security Monitoring (NSM) solution is going to give you
+
+(page 61)
